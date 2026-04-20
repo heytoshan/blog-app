@@ -5,10 +5,11 @@ import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   TrendingUp, Flame, Sparkles, ChevronRight,
-  ArrowRight, Users, BookOpen, Zap
+  ArrowRight, Users, BookOpen, Zap, Award
 } from 'lucide-react';
 import BlogCard from '../components/BlogCard';
 import { BlogCardSkeleton } from '../components/Skeletons';
+import axios from '../lib/axios';
 
 const CATEGORIES = ['All', 'Technology', 'Design', 'Startups', 'Productivity', 'Mindset', 'Programming', 'Philosophy'];
 
@@ -24,6 +25,7 @@ const Home = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const [activeCategory, setActiveCategory] = useState('All');
+  const [topWriters, setTopWriters] = useState<any[]>([]);
 
   const searchQuery = searchParams.get('search') || '';
 
@@ -33,6 +35,11 @@ const Home = () => {
     if (activeCategory !== 'All') params.category = activeCategory;
     fetchBlogs(params);
     fetchTrendingBlogs();
+    
+    // Fetch Top Writers
+    axios.get('/users/top-writers?limit=4')
+      .then(res => setTopWriters(res.data.data))
+      .catch(console.error);
   }, [searchQuery, activeCategory, fetchBlogs, fetchTrendingBlogs]);
 
   const handleCategoryClick = (cat: string) => {
@@ -248,6 +255,30 @@ const Home = () => {
               ))}
             </div>
           </div>
+
+          {/* Top Writers */}
+          {topWriters.length > 0 && (
+            <div className="surface rounded-2xl p-5">
+              <h3 className="text-sm font-bold text-white mb-4 flex items-center gap-2">
+                <Award size={15} className="text-blue-400" /> Top Writers
+              </h3>
+              <div className="space-y-4">
+                {topWriters.map((writer) => (
+                  <Link key={writer._id} to={`/profile/${writer.username}`} className="flex items-center gap-3 group">
+                    <img 
+                      src={writer.avatar || `https://ui-avatars.com/api/?name=${writer.fullName}&background=222&color=fff`} 
+                      alt="" 
+                      className="w-10 h-10 rounded-full object-cover ring-2 ring-transparent group-hover:ring-white/20 transition-all" 
+                    />
+                    <div className="min-w-0 flex-1">
+                      <p className="text-[13px] font-bold text-white group-hover:underline truncate">{writer.fullName}</p>
+                      <p className="text-[11px] text-gray-500 truncate">{writer.followersCount} followers</p>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* CTA for non-logged users */}
           {!user && (

@@ -38,8 +38,8 @@ export const getCategoryColor = (cat: string) =>
 const BlogCard = ({ blog, index = 0, compact = false }: BlogCardProps) => {
   const { user, updateBookmarks } = useAuthStore();
   const { toggleLike, toggleBookmark } = useBlogStore();
-  const isLiked = user ? (blog.likes || []).includes(user._id) : false;
-  const isBookmarked = user ? (user.bookmarks || []).includes(blog._id) : false;
+  const isLiked = user ? (blog.likes || []).some(id => (typeof id === 'object' ? (id as any)._id === user._id : id === user._id)) : false;
+  const isBookmarked = user ? (user.bookmarks || []).some(id => (typeof id === 'object' ? (id as any)._id === blog._id : id === blog._id)) : false;
 
   const fallbackImg = FALLBACK_IMAGES[index % FALLBACK_IMAGES.length];
   const primaryCategory = blog.categories?.[0];

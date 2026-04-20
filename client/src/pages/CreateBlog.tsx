@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useBlogStore } from '../store/useBlogStore';
 import { ImagePlus, X, Send, ArrowLeft, Loader2, Tag, Layout, Folders, Eye, EyeOff } from 'lucide-react';
@@ -21,6 +21,26 @@ const CreateBlog = () => {
   const { createBlog } = useBlogStore();
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Load from local storage on mount
+  useEffect(() => {
+    const savedDraft = localStorage.getItem('blogy_draft');
+    if (savedDraft) {
+      try {
+        setFormData(JSON.parse(savedDraft));
+      } catch (err) {
+        console.error('Error loading draft', err);
+      }
+    }
+  }, []);
+
+  // Auto-save to local storage on changes
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      localStorage.setItem('blogy_draft', JSON.stringify(formData));
+    }, 1000);
+    return () => clearTimeout(timeoutId);
+  }, [formData]);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files?.[0]) {
@@ -56,7 +76,10 @@ const CreateBlog = () => {
 
     try {
       const blog = await createBlog(blogData);
-      if (blog) navigate(`/blog/${blog.slug}`);
+      if (blog) {
+        localStorage.removeItem('blogy_draft'); // Clear draft on successful publish
+        navigate(`/blog/${blog.slug}`);
+      }
     } finally {
       setIsPublishing(false);
     }

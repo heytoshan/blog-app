@@ -101,17 +101,18 @@ export const useBlogStore = create<BlogState>((set) => ({
     const updateBlogLikes = (blog: Blog) => {
       if (blog._id !== blogId) return blog;
       const likes = blog.likes || [];
-      const isLiked = likes.includes(userId);
+      const isLiked = likes.some(id => typeof id === 'object' ? (id as any)._id === userId : id === userId);
       return {
         ...blog,
         likes: isLiked
-          ? likes.filter(id => id !== userId)
+          ? likes.filter(id => typeof id === 'object' ? (id as any)._id !== userId : id !== userId)
           : [...likes, userId],
       };
     };
 
     set(state => ({
       blogs: state.blogs.map(updateBlogLikes),
+      trendingBlogs: state.trendingBlogs.map(updateBlogLikes),
       currentBlog: state.currentBlog ? updateBlogLikes(state.currentBlog) : null,
     }));
 
@@ -121,6 +122,7 @@ export const useBlogStore = create<BlogState>((set) => ({
       // Revert on error
       set(state => ({
         blogs: state.blogs.map(updateBlogLikes),
+        trendingBlogs: state.trendingBlogs.map(updateBlogLikes),
         currentBlog: state.currentBlog ? updateBlogLikes(state.currentBlog) : null,
       }));
       toast.error('Action failed');

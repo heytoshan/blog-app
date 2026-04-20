@@ -59,8 +59,10 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     set({ loading: true });
     try {
       const res = await axios.post('/auth/login', data);
-      set({ user: res.data.data.user });
-      toast.success(`Welcome back, ${res.data.data.user.fullName.split(' ')[0]}! 👋`);
+      const { user, accessToken } = res.data.data;
+      localStorage.setItem('accessToken', accessToken);
+      set({ user });
+      toast.success(`Welcome back, ${user.fullName.split(' ')[0]}! 👋`);
     } catch (error: any) {
       toast.error(error.response?.data?.message || 'Login failed');
     } finally {
@@ -77,6 +79,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       // Always clear local state regardless of server response
       set({ user: null });
       localStorage.removeItem('user');
+      localStorage.removeItem('accessToken');
       sessionStorage.clear();
       toast.success('Logged out successfully');
     }

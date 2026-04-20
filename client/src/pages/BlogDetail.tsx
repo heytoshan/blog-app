@@ -167,7 +167,7 @@ const BlogDetail = () => {
     if (currentBlog) {
       fetchComments(currentBlog._id);
       fetchBlogs({ category: currentBlog.categories?.[0], limit: 3 });
-      setIsBookmarked((user?.bookmarks || []).includes(currentBlog._id));
+      setIsBookmarked((user?.bookmarks || []).some(id => typeof id === 'object' ? (id as any)._id === currentBlog._id : id === currentBlog._id));
     }
   }, [currentBlog?._id, user]);
 
@@ -220,7 +220,7 @@ const BlogDetail = () => {
     <div className="text-center py-24 text-gray-500 font-semibold">Blog post not found.</div>
   );
 
-  const isLiked = user ? (currentBlog.likes || []).includes(user._id) : false;
+  const isLiked = user ? (currentBlog.likes || []).some(id => typeof id === 'object' ? (id as any)._id === user._id : id === user._id) : false;
 
   // Format content with basic markdown-ish rendering
   const renderContent = (content: string) => {

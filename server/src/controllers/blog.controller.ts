@@ -78,22 +78,23 @@ export const getBlogs = asyncHandler(async (req: Request, res: Response) => {
 export const getTrendingBlogs = asyncHandler(async (req: Request, res: Response) => {
   const { limit = 10 } = req.query;
 
-  // Trending = most views + likes in the past 30 days
+  // We will build a pipeline that calculates the score based on views + likes
+  // Trending = most views + likes in the past 30 days, or globally if not enough
   const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
 
-  const blogs = await Blog.aggregate([
-    { $match: { isPublished: true, createdAt: { $gte: thirtyDaysAgo } } },
+  const aggregationPipeline = (recentOnly: boolean): any[] => [
+    { $match: { isPublished: true, ...(recentOnly ? { createdAt: { $gte: thirtyDaysAgo } } : {}) } },
     {
       $addFields: {
         score: {
           $add: [
-            '$views',
-            { $multiply: [{ $size: '$likes' }, 5] }, // likes weighted more
+            { $ifNull: ['$views', 0] },
+            { $multiply: [{ $size: { $ifNull: ['$likes', []] } }, 5] }, // likes weighted more
           ],
         },
       },
     },
-    { $sort: { score: -1 } },
+    { $sort: { score: -1, createdAt: -1 } },
     { $limit: Number(limit) },
     {
       $lookup: {
@@ -105,15 +106,13 @@ export const getTrendingBlogs = asyncHandler(async (req: Request, res: Response)
       },
     },
     { $unwind: '$author' },
-  ]);
+  ];
 
-  // If not enough recent, fall back to all-time top
+  let blogs = await Blog.aggregate(aggregationPipeline(true));
+
+  // If not enough recent, fall back to all-time top but keep correctly scored
   if (blogs.length < 4) {
-    const allTime = await Blog.find({ isPublished: true })
-      .populate('author', 'username fullName avatar')
-      .sort({ views: -1, createdAt: -1 })
-      .limit(Number(limit));
-    return res.status(200).json(new ApiResponse(200, allTime, 'Trending blogs fetched'));
+    blogs = await Blog.aggregate(aggregationPipeline(false));
   }
 
   return res.status(200).json(new ApiResponse(200, blogs, 'Trending blogs fetched'));
