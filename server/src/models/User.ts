@@ -104,14 +104,14 @@ userSchema.methods.isPasswordCorrect = async function (password: string) {
 userSchema.methods.generateAccessToken = function () {
   return jwt.sign(
     {
-      _id: this._id,
+      _id: this._id.toString(),
       email: this.email,
       username: this.username,
       role: this.role,
     },
     process.env.JWT_SECRET as string,
     {
-      expiresIn: process.env.JWT_EXPIRES_IN || '30d',
+      expiresIn: (process.env.JWT_EXPIRES_IN || '30d') as any,
     }
   );
 };
@@ -120,11 +120,11 @@ userSchema.methods.generateAccessToken = function () {
 userSchema.methods.generateRefreshToken = function () {
   return jwt.sign(
     {
-      _id: this._id,
+      _id: this._id.toString(),
     },
     process.env.JWT_SECRET as string, // Should use a separate secret in production
     {
-      expiresIn: '90d',
+      expiresIn: '90d' as any,
     }
   );
 };
