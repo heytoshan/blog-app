@@ -21,8 +21,12 @@ app.use(cookieParser());
 app.use(
   cors({
     origin: (origin, callback) => {
-      // Allow any localhost port during development
-      if (!origin || /^http:\/\/localhost:\d+$/.test(origin)) {
+      const allowedOrigins = [process.env.CLIENT_URL];
+      if (
+        !origin ||
+        /^http:\/\/localhost:\d+$/.test(origin) ||
+        (process.env.CLIENT_URL && origin === process.env.CLIENT_URL)
+      ) {
         callback(null, true);
       } else {
         callback(new Error('Not allowed by CORS'));
