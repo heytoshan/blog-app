@@ -3,6 +3,7 @@
   "private": true,
   "scripts": {
     "install-all": "npm install --prefix client && npm install --prefix server",
+    "dev": "concurrently \"npm run server-dev\" \"npm run client-dev\"",
     "client-dev": "npm run dev --prefix client",
     "server-dev": "npm run dev --prefix server",
     "build": "npm run build --prefix client && npm run build --prefix server"
@@ -13,5 +14,8 @@
   "workspaces": [
     "client",
     "server"
-  ]
+  ],
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
 }
