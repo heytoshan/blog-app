@@ -35,11 +35,16 @@ app.set('io', io);
 // Port and server listener
 const PORT = process.env.PORT || 5000;
 
-connectDB().then(() => {
-  server.listen(PORT, () => {
-    console.log(`Server is running at http://localhost:${PORT}`);
+if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
+  connectDB().then(() => {
+    server.listen(PORT, () => {
+      console.log(`Server is running at http://localhost:${PORT}`);
+    });
   });
-});
+} else {
+  // On Vercel, just connect to DB
+  connectDB();
+}
 
 export { io, app };
 export default app;
