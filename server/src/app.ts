@@ -9,6 +9,7 @@ import { ApiError } from './utils/ApiError';
 import authRouter from './routes/auth.routes';
 import userRouter from './routes/user.routes';
 import blogRouter from './routes/blog.routes';
+import commentRouter from './routes/comment.routes';
 import newsletterRouter from './routes/newsletter.routes';
 
 const app = express();
@@ -21,16 +22,18 @@ app.use(cookieParser());
 app.use(
   cors({
     origin: (origin, callback) => {
-      const allowedOrigins = [process.env.CLIENT_URL];
-      if (
-        !origin ||
-        /^http:\/\/localhost:\d+$/.test(origin) ||
-        (process.env.CLIENT_URL && origin === process.env.CLIENT_URL)
-      ) {
-        callback(null, true);
-      } else {
-        callback(new Error('Not allowed by CORS'));
+      // Allow requests with no origin (mobile apps, curl, etc.)
+      if (!origin) return callback(null, true);
+
+      // Allow all localhost origins during development
+      if (/^http:\/\/localhost:\d+$/.test(origin)) return callback(null, true);
+
+      // Allow the configured client URL in production
+      if (process.env.CLIENT_URL && origin === process.env.CLIENT_URL) {
+        return callback(null, true);
       }
+
+      return callback(new Error('Not allowed by CORS'));
     },
     credentials: true,
   })
@@ -57,10 +60,11 @@ app.get('/api/v1/health', (req, res) => {
   res.status(200).json({ status: 'OK', message: 'Server is running' });
 });
 
-// Import Routes
+// Routes
 app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/blogs', blogRouter);
+app.use('/api/v1/blogs/:blogId/comments', commentRouter);
 app.use('/api/v1/newsletter', newsletterRouter);
 
 // Error Handling Middleware
