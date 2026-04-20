@@ -184,6 +184,7 @@ const Admin = () => {
                     <th className="px-6 py-4">Email</th>
                     <th className="px-6 py-4">Role</th>
                     <th className="px-6 py-4">Joined</th>
+                    <th className="px-6 py-4">Activity Log</th>
                     <th className="px-6 py-4 text-right">Actions</th>
                   </tr>
                 </thead>
@@ -207,6 +208,16 @@ const Admin = () => {
                       </td>
                       <td className="px-6 py-4 text-gray-500 text-[12px]">
                         {new Date(u.createdAt).toLocaleDateString()}
+                      </td>
+                      <td className="px-6 py-4 text-gray-500 text-[12px] min-w-[140px]">
+                        {u.lastLogin ? (
+                          <div className="flex flex-col">
+                            <span className="text-gray-300">Last login: {new Date(u.lastLogin).toLocaleDateString()}</span>
+                            <span className="text-[10px]">{new Date(u.lastLogin).toLocaleTimeString()}</span>
+                          </div>
+                        ) : (
+                          <span className="text-gray-600">No activity yet</span>
+                        )}
                       </td>
                       <td className="px-6 py-4 text-right">
                         <div className="flex items-center justify-end gap-2">

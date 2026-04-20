@@ -5,7 +5,7 @@ import { Mail, Lock, Loader2, ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const Login = () => {
-  const [formData, setFormData] = useState({ email: '', password: '' });
+  const [formData, setFormData] = useState({ identifier: '', password: '' });
   const { login, loading } = useAuthStore();
   const navigate = useNavigate();
 
@@ -38,17 +38,17 @@ const Login = () => {
         <div className="surface rounded-3xl p-8">
           <form onSubmit={handleSubmit} className="space-y-5" id="login-form">
             <div className="space-y-1.5">
-              <label className="text-[11px] font-bold uppercase tracking-wider text-gray-500">Email</label>
+              <label className="text-[11px] font-bold uppercase tracking-wider text-gray-500">Email or Username</label>
               <div className="relative">
                 <Mail size={15} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-600 pointer-events-none" />
                 <input
-                  id="login-email"
-                  type="email"
+                  id="login-identifier"
+                  type="text"
                   required
-                  placeholder="you@example.com"
+                  placeholder="you@example.com or admin"
                   className="w-full bg-white/[0.04] border border-white/[0.08] rounded-2xl py-3.5 pl-11 pr-4 text-sm text-white placeholder:text-gray-700 focus:outline-none focus:border-white/20 focus:bg-white/[0.06] transition-all"
-                  value={formData.email}
-                  onChange={e => setFormData({ ...formData, email: e.target.value })}
+                  value={formData.identifier}
+                  onChange={e => setFormData({ ...formData, identifier: e.target.value })}
                 />
               </div>
             </div>
@@ -101,7 +101,7 @@ const Login = () => {
         {/* Demo credentials hint */}
         <div className="mt-4 px-4 py-3 rounded-2xl bg-white/[0.02] border border-white/[0.05] text-center">
           <p className="text-[11px] text-gray-600">
-            Demo: <span className="text-gray-400 font-mono">alex@blogy.dev</span> / <span className="text-gray-400 font-mono">Password123</span>
+            Demo: <span className="text-gray-400 font-mono">admin</span> / <span className="text-gray-400 font-mono">Toshan@0001</span>
           </p>
         </div>
       </motion.div>

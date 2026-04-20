@@ -13,7 +13,7 @@ const registerSchema = z.object({
 });
 
 const loginSchema = z.object({
-  email: z.string().email('Invalid email address'),
+  identifier: z.string().min(3, 'Username or email is required'),
   password: z.string().min(6, 'Password must be at least 6 characters'),
 });
 
@@ -67,9 +67,12 @@ export const loginUser = asyncHandler(async (req: Request, res: Response) => {
     throw new ApiError(400, 'Validation failed');
   }
 
-  const { email, password } = validation.data;
+  const { identifier, password } = validation.data;
 
-  const user = await User.findOne({ email });
+  // Search by either email or username
+  const user = await User.findOne({
+    $or: [{ email: identifier }, { username: identifier.toLowerCase() }]
+  });
 
   if (!user) {
     throw new ApiError(404, 'User does not exist');
@@ -83,6 +86,9 @@ export const loginUser = asyncHandler(async (req: Request, res: Response) => {
 
   const accessToken = user.generateAccessToken();
   const refreshToken = user.generateRefreshToken();
+
+  user.lastLogin = new Date();
+  await user.save({ validateBeforeSave: false });
 
   const loggedInUser = await User.findById(user._id).select('-password');
 

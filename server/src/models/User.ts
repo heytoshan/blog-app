@@ -11,6 +11,7 @@ export interface IUser extends Document {
   avatar?: string;
   bio?: string;
   role: 'user' | 'author' | 'admin';
+  lastLogin?: Date;
   followers: mongoose.Types.ObjectId[];
   following: mongoose.Types.ObjectId[];
   bookmarks: mongoose.Types.ObjectId[];
@@ -65,6 +66,9 @@ const userSchema: Schema<IUser> = new Schema(
       type: String,
       enum: ['user', 'author', 'admin'],
       default: 'user',
+    },
+    lastLogin: {
+      type: Date,
     },
     followers: [
       {
