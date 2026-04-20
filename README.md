@@ -98,6 +98,29 @@ A full-stack blog application built with React, TypeScript, Express, and MongoDB
    npm run dev
    ```
 
-## License
+## Deployment
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+### Backend (Server)
+**Important:** Because this project uses **Socket.io** for real-time features, it is recommended to deploy the backend on a platform that supports long-lived connections, such as **Render**, **Railway**, or **DigitalOcean**. 
+
+1. Create a new Web Service on Render/Railway.
+2. Connect this GitHub repository.
+3. Set the Root Directory to `server`.
+4. Build Command: `npm install && npm run build`.
+5. Start Command: `npm start`.
+6. Add all environment variables from your `.env` file to the platform's dashboard.
+
+### Frontend (Client)
+The frontend can be easily deployed on **Vercel**.
+
+1. Go to [Vercel](https://vercel.com) and create a new project.
+2. Connect this GitHub repository.
+3. Set the **Root Directory** to `client`.
+4. Framework Preset: **Vite**.
+5. Build Command: `npm run build`.
+6. Output Directory: `dist`.
+7. **Environment Variables**: Add `VITE_API_URL` and set it to your deployed backend URL (e.g., `https://blog-app-api.onrender.com/api/v1`).
+
+---
+
+## License
