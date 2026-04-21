@@ -2,15 +2,23 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Heart, Rss, Globe, Mail } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { useAuthStore } from '../store/useAuthStore';
 import axios from '../lib/axios';
 
 const Footer = () => {
+  const { user } = useAuthStore();
   const year = new Date().getFullYear();
   const [email, setEmail] = useState('');
   const [isSubscribing, setIsSubscribing] = useState(false);
 
   const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!user) {
+      toast.error('Please login first to subscribe');
+      return;
+    }
+
     if (!email.trim() || !email.includes('@')) {
       toast.error('Please enter a valid email address');
       return;
