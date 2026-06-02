@@ -1,6 +1,6 @@
-# ✍️ Blogly - Enterprise-Grade Full-Stack Publishing Platform
+# ✍️ Blogy - Enterprise-Grade Full-Stack Publishing Platform
 
-Blogly is a next-generation, full-stack multi-user content publication platform built to deliver an exceptionally polished, fast, and interactive writing experience. Designed for seamless collaboration and high discoverability, it connects readers, creators, and administrators inside a unified, high-performance web environment powered by real-time notification sockets, deep comment indexing, and automated newsletter distribution.
+Blogy is a next-generation, full-stack multi-user content publication platform built to deliver an exceptionally polished, fast, and interactive writing experience. Designed for seamless collaboration and high discoverability, it connects readers, creators, and administrators inside a unified, high-performance web environment powered by real-time notification sockets, deep comment indexing, and automated newsletter distribution.
 
 ---
 
@@ -15,8 +15,9 @@ Traditional content management systems and blog engines struggle to keep pace wi
 
 ---
 
-## 💡 The Solution: Blogly
-Blogly addresses these core issues by establishing a highly interactive, unified operating space for digital creators and consumers. By coupling automated metadata calculations with real-time socket events, seamless OAuth onboarding, and cloud-optimized media delivery, Blogly transforms standard blogging into an active, social, and zero-friction publication experience.
+## 💡 The Solution: Blogy
+
+Blogy addresses these core issues by establishing a highly interactive, unified operating space for digital creators and consumers. By coupling automated metadata calculations with real-time socket events, seamless OAuth onboarding, and cloud-optimized media delivery, Blogy transforms standard blogging into an active, social, and zero-friction publication experience.
 
 ---
 
@@ -109,8 +110,8 @@ The primary engagement hub designed to provide readers with curated discoveries 
 ## 📦 Deployment & Setup
 
 ### Production Live Links
-* **Frontend (Vercel):** `https://blogly-platform.vercel.app`
-* **Backend (Render):** `https://blogly-backend.onrender.com`
+* **Frontend (Vercel):** `https://blogy-platform.vercel.app`
+* **Backend (Render):** `https://blogy-backend.onrender.com`
 
 ### Admin Credentials (Demo Setup)
 * **Email:** `admin@blogy.dev`
@@ -132,7 +133,7 @@ Create a `.env` file in the `./server` folder:
 ```env
 PORT=5000
 NODE_ENV=development
-MONGODB_URI=mongodb+srv://<username>:<password>@cluster.mongodb.net/blogly?retryWrites=true&w=majority
+MONGODB_URI=mongodb+srv://<username>:<password>@cluster.mongodb.net/blogy?retryWrites=true&w=majority
 JWT_SECRET=your_super_secret_jwt_key_here
 JWT_EXPIRES_IN=30d
 
