@@ -17,10 +17,12 @@ const loginSchema = z.object({
   password: z.string().min(6, 'Password must be at least 6 characters'),
 });
 
+const isProdEnv = process.env.NODE_ENV === 'production' || !!process.env.VERCEL;
+
 const cookieOptions = {
   httpOnly: true,
-  secure: process.env.NODE_ENV === 'production',
-  sameSite: process.env.NODE_ENV === 'production' ? ('none' as const) : ('lax' as const),
+  secure: isProdEnv,
+  sameSite: isProdEnv ? ('none' as const) : ('lax' as const),
 };
 
 export const registerUser = asyncHandler(async (req: Request, res: Response) => {

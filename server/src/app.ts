@@ -12,32 +12,78 @@ import blogRouter from './routes/blog.routes';
 import commentRouter from './routes/comment.routes';
 import newsletterRouter from './routes/newsletter.routes';
 
+import connectDB from './config/db';
+
 const app = express();
 
+// Ensure DB connection for incoming requests (vital for Vercel serverless functions)
+app.use(async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    await connectDB();
+    next();
+  } catch (err) {
+    next(err);
+  }
+});
+
+// Helper to normalize origins (strip trailing slashes)
+const normalizeOrigin = (url: string) => url.trim().replace(/\/$/, '');
+
+const configuredOrigins = (process.env.CLIENT_URL || '')
+  .split(',')
+  .map((url) => normalizeOrigin(url))
+  .filter(Boolean);
+
+const defaultAllowedOrigins = [
+  'https://bloggyapp.vercel.app',
+  'http://localhost:5173',
+  'http://localhost:3000',
+  'http://localhost:5000',
+];
+
+const allowedOrigins = Array.from(
+  new Set([...configuredOrigins, ...defaultAllowedOrigins])
+);
+
 // Middlewares
-app.use(helmet());
+app.use(
+  helmet({
+    crossOriginResourcePolicy: { policy: 'cross-origin' },
+  })
+);
 app.use(compression());
 app.use(morgan('dev'));
 app.use(cookieParser());
+
 app.use(
   cors({
     origin: (origin, callback) => {
-      // Allow requests with no origin (mobile apps, curl, etc.)
+      // Allow requests with no origin (mobile apps, curl, Postman, server-to-server)
       if (!origin) return callback(null, true);
 
-      // Allow all localhost origins during development
-      if (/^http:\/\/localhost:\d+$/.test(origin)) return callback(null, true);
+      const cleanOrigin = normalizeOrigin(origin);
 
-      // Allow the configured client URL in production
-      if (process.env.CLIENT_URL && origin === process.env.CLIENT_URL) {
+      // Allow all localhost origins during development
+      if (/^http:\/\/localhost:\d+$/.test(cleanOrigin)) {
         return callback(null, true);
       }
 
-      return callback(new Error('Not allowed by CORS'));
+      // Allow explicitly defined origins or any Vercel deployment domain (*.vercel.app)
+      if (
+        allowedOrigins.includes(cleanOrigin) ||
+        /\.vercel\.app$/.test(cleanOrigin)
+      ) {
+        return callback(null, true);
+      }
+
+      return callback(null, false);
     },
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
   })
 );
+
 app.use(express.json({ limit: '16kb' }));
 app.use(express.urlencoded({ extended: true, limit: '16kb' }));
 app.use(express.static('public'));
